@@ -1,0 +1,266 @@
+/* 
+  Decision log:
+  - Two ways to enable Tailwind v4:
+    A) Old '@tailwind base/components/utilities' directives.
+    B) New CSS-first '@import "tailwindcss"' (recommended in v4).
+    -> Chose B to align with Tailwind v4 and unlock CSS plugin loading.
+  - Two ways to load DaisyUI:
+    A) tailwind.config plugins array (legacy, not reliable in v4).
+    B) CSS '@plugin "daisyui"' (v4-compatible and allows inline config).
+    -> Chose B; also define themes in CSS via '@plugin "daisyui/theme"' so ThemeToggle's 'glasslight/glassdark' names work.
+*/
+
+@import "tailwindcss";
+
+/* 
+  DaisyUI core: enable our custom themes by name.
+  - Option A: use built-in 'light'/'dark'.
+  - Option B: define 'glasslight'/'glassdark' to learn tokens and tailor glass contrast.
+  -> Chose B; 'glasslight' default, 'glassdark' for prefers dark.
+*/
+@plugin "daisyui" {
+  themes: glasslight --default, glassdark --prefersdark;
+}
+
+/*
+  Custom theme: glasslight
+  - We use readable CSS variables introduced in DaisyUI v5.
+  - Hex colors are fine; OKLCH is recommended but optional.
+*/
+@plugin "daisyui/theme" {
+  name: "glasslight";
+  default: true;
+  color-scheme: light;
+
+  /* Base surfaces and text */
+  --color-base-100: #ffffff;
+  --color-base-200: #f3f4f6;
+  --color-base-300: #e5e7eb;
+  --color-base-content: #111827;
+
+  /* Brand tokens */
+  --color-primary: #60a5fa; /* blue-400 */
+  --color-primary-content: #ffffff;
+  --color-secondary: #f472b6; /* pink-400 */
+  --color-secondary-content: #ffffff;
+  --color-accent: #34d399; /* emerald-400 */
+  --color-accent-content: #0f172a;
+  --color-neutral: #374151; /* gray-700 */
+  --color-neutral-content: #e5e7eb;
+
+  /* Semantic */
+  --color-info: #38bdf8;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Radius/size/border for components */
+  --radius-selector: 0.75rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+
+  /* Effects (depth/noise used by some components) */
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Dark counterpart tuned for glass legibility */
+@plugin "daisyui/theme" {
+  name: "glassdark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #0f172a; /* slate-900-ish */
+  --color-base-200: #111827; /* gray-900 */
+  --color-base-300: #1f2937; /* gray-800 */
+  --color-base-content: #e5e7eb;
+
+  --color-primary: #93c5fd; /* blue-300 */
+  --color-primary-content: #0f172a;
+  --color-secondary: #f9a8d4; /* pink-300 */
+  --color-secondary-content: #0f172a;
+  --color-accent: #6ee7b7; /* emerald-300 */
+  --color-accent-content: #0f172a;
+  --color-neutral: #1f2937; /* gray-800 */
+  --color-neutral-content: #e5e7eb;
+
+  --color-info: #38bdf8;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --radius-selector: 0.75rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+
+  --depth: 2;
+  --noise: 0.02;
+}
+
+/* 
+  Backdrop for glass panels:
+  - Option A: page-local gradient utilities.
+  - Option B: global gradients to ensure glass looks good everywhere.
+  -> Chose B for immediate visual feedback.
+*/
+/* 
+  Decision:
+  - Keep Tailwind v4 CSS-first setup and DaisyUI plugins as-is.
+  - Extend gradient coverage using a fixed overlay element (#app-bg) so no solid band is visible.
+*/
+/* Keep layout positioning */
+html,
+body {
+  min-height: 100%;
+  position: relative;
+}
+
+/* Unified backdrop: viewport-anchored overlay (remove any earlier #app-bg rule) */
+#app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0; /* was -1/-10; ensure it's visible above body background */
+  pointer-events: none;
+
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  /* Stable RGBA glows instead of color-mix to avoid browser quirks */
+  background-image: radial-gradient(
+      120vh 85vh at 10% 8%,
+      rgba(96, 165, 250, 0.26),
+      transparent 60%
+    ),
+    radial-gradient(
+      110vh 75vh at 90% 12%,
+      rgba(244, 114, 182, 0.22),
+      transparent 62%
+    ),
+    radial-gradient(
+      150vh 100vh at 50% 93%,
+      rgba(52, 211, 153, 0.22),
+      transparent 68%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+/* Baseline surface; overlay adds mood */
+body {
+  background-color: var(--color-base-100);
+}
+
+/* Example utility (we’ll prefer 'glass' from DaisyUI) */
+.glass-card {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Unified backdrop: viewport-anchored glows (no stripes) */
+#app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  /* Pin to viewport so glows are always visible */
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  /* Use theme tokens via color-mix, and viewport units so coverage scales */
+  background-image:
+    /* Top-left glow */ radial-gradient(
+      125vh 85vh at 12% 12%,
+      color-mix(in oklab, var(--color-primary) 28%, transparent),
+      transparent 60%
+    ),
+    /* Top-right glow */
+      radial-gradient(
+        110vh 75vh at 88% 12%,
+        color-mix(in oklab, var(--color-secondary) 22%, transparent),
+        transparent 68%
+      ),
+    /* Top-center glow to avoid grey at the very top */
+      radial-gradient(
+        140vh 90vh at 50% 10%,
+        color-mix(in oklab, var(--color-primary) 18%, transparent),
+        transparent 68%
+      ),
+    /* Bottom-center glow to keep foot of viewport lively */
+      radial-gradient(
+        150vh 100vh at 50% 90%,
+        color-mix(in oklab, var(--color-accent) 22%, transparent),
+        transparent 68%
+      ),
+    /* Gentle vertical wash for subtle depth (not repeating) */
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--color-base-100) 10%, transparent),
+        color-mix(in oklab, var(--color-base-100) 4%, transparent)
+      );
+}
+
+/* Unified backdrop: viewport-anchored overlay using body::before (no duplicate rules) */
+body {
+  background-color: var(--color-base-100);
+  position: relative; /* establishes stacking context for ::before */
+}
+
+body::before {
+  content: "";
+  position: fixed; /* anchor to viewport */
+  inset: 0;
+  z-index: 0; /* above body background, below content */
+  pointer-events: none;
+
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  /* Subtle glows placed at edges; stable RGBA for cross-browser consistency */
+  background-image: radial-gradient(
+      120vh 85vh at 10% 8%,
+      rgba(96, 165, 250, 0.26),
+      transparent 60%
+    ),
+    /* top-left */
+      radial-gradient(
+        110vh 75vh at 90% 12%,
+        rgba(244, 114, 182, 0.22),
+        transparent 62%
+      ),
+    /* top-right */
+      radial-gradient(
+        140vh 90vh at 50% 6%,
+        rgba(96, 165, 250, 0.18),
+        transparent 68%
+      ),
+    /* top-center */
+      radial-gradient(
+        150vh 100vh at 50% 94%,
+        rgba(52, 211, 153, 0.22),
+        transparent 68%
+      ),
+    /* bottom-center */
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05)
+      ); /* gentle wash */
+}
+
+/* Simplify body baseline; overlay provides mood */
+body {
+  background-color: var(--color-base-100);
+}
