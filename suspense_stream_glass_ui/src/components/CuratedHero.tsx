@@ -58,15 +58,21 @@ export default async function CuratedHero() {
   }
 
   return (
-    // Decision: Use DaisyUI 'card image-full' for a proper hero layout with overlay text
-    <div className="card glass image-full overflow-hidden">
-      <figure className="relative h-64 sm:h-80">
+    // Avoid layout blowups when CSS loads late: keep image dimensions explicit.
+    <div className="card glass overflow-hidden">
+      <figure>
         <Image
           src={photo.src.landscape || photo.src.large}
           alt={photo.alt || "Featured photo"}
-          fill
-          sizes="(max-width: 768px) 100vw, 768px"
-          className="object-cover"
+          width={1600}
+          height={900}
+          sizes="100vw"
+          style={{
+            width: "100%",
+            height: "min(42vh, 520px)",
+            minHeight: "260px",
+            objectFit: "cover",
+          }}
           priority
         />
       </figure>
