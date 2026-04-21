@@ -157,6 +157,72 @@ body {
   background-color: var(--color-base-100);
 }
 
+/* Homepage enhancement: neon title, pulsing status, and subtle float animation */
+.neon-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.neon-shell::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: 1rem;
+  opacity: 0.55;
+  background: linear-gradient(
+    120deg,
+    rgba(96, 165, 250, 0.32),
+    rgba(244, 114, 182, 0.3),
+    rgba(52, 211, 153, 0.25)
+  );
+  filter: blur(14px);
+}
+
+.neon-title {
+  background: linear-gradient(110deg, #93c5fd, #f9a8d4, #6ee7b7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.status-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 9999px;
+  background: #34d399;
+  box-shadow: 0 0 0 rgba(52, 211, 153, 0.55);
+  animation: status-pulse 1.8s ease-out infinite;
+}
+
+.hero-float {
+  animation: gentle-float 5s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(52, 211, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+@keyframes gentle-float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
 /* Example utility (we’ll prefer 'glass' from DaisyUI) */
 .glass-card {
   backdrop-filter: blur(12px);
