@@ -11,7 +11,7 @@ A Next.js 16 demo app that combines:
 
 The home page now includes a more exciting visual style:
 
-- Neon gradient hero title
+- Neon gradient hero title with "Suspense Stream Glass"
 - Animated live status pulse
 - Quick query chips (`nature`, `ocean`, `city`, etc.)
 - Floating featured section motion
